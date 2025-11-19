@@ -1,0 +1,112 @@
+name: Release
+
+on:
+  push:
+    tags:
+      - 'v*.*.*'
+
+jobs:
+  publish:
+    name: Build and Release
+    runs-on: ubuntu-latest
+    permissions:
+      contents: write
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+
+      - name: Resolve version
+        id: version
+        run: |
+          TAG="${GITHUB_REF_NAME}"
+          VERSION="${TAG#v}"
+          echo "tag=$TAG" >> "$GITHUB_OUTPUT"
+          echo "version=$VERSION" >> "$GITHUB_OUTPUT"
+
+      - name: Build release notes
+        id: notes
+        uses: actions/github-script@v7
+        env:
+          CURRENT_TAG: ${{ steps.version.outputs.tag }}
+        with:
+          script: |
+            const { execSync } = require('node:child_process');
+            const currentTag = process.env.CURRENT_TAG;
+
+            let tagsRaw = '';
+            try {
+              tagsRaw = execSync('git tag --list "v[0-9]*" --sort=-v:refname', { stdio: ['ignore', 'pipe', 'ignore'] }).toString().trim();
+            } catch (error) {
+              tagsRaw = '';
+            }
+
+            const tags = tagsRaw ? tagsRaw.split('\n').filter(Boolean) : [];
+            const currentIndex = tags.indexOf(currentTag);
+            const previousTag = currentIndex !== -1 && currentIndex < tags.length - 1 ? tags[currentIndex + 1] : '';
+
+            if (!previousTag) {
+              core.setOutput('body', 'Initial Release');
+              core.setOutput('previous_tag', '');
+              return;
+            }
+
+            let shaOutput = '';
+            try {
+              shaOutput = execSync(`git log --pretty=format:%H --reverse ${previousTag}..${currentTag}`, { stdio: ['ignore', 'pipe', 'ignore'] }).toString().trim();
+            } catch (error) {
+              shaOutput = '';
+            }
+
+            if (!shaOutput) {
+              core.setOutput('body', `No commits found since ${previousTag}.`);
+              core.setOutput('previous_tag', previousTag);
+              return;
+            }
+
+            const shas = shaOutput.split('\n').filter(Boolean);
+            const lines = [];
+
+            for (const sha of shas) {
+              const { data: commit } = await github.rest.repos.getCommit({
+                owner: context.repo.owner,
+                repo: context.repo.repo,
+                ref: sha,
+              });
+              const title = commit.commit.message.split('\n')[0];
+
+              const { data: prs } = await github.rest.repos.listPullRequestsAssociatedWithCommit({
+                owner: context.repo.owner,
+                repo: context.repo.repo,
+                commit_sha: sha,
+              });
+
+              const suffix = prs.length > 0
+                ? `(in #${prs[0].number})`
+                : `(in ${sha.substring(0, 7)})`;
+
+              lines.push(`- ${title} ${suffix}`);
+            }
+
+            if (lines.length === 0) {
+              core.setOutput('body', `No commits found since ${previousTag}.`);
+            } else {
+              core.setOutput('body', lines.join('\n'));
+            }
+            core.setOutput('previous_tag', previousTag);
+
+      - name: Package build output
+        run: |
+          VERSION="${{ steps.version.outputs.version }}"
+          ARCHIVE="JailbreakCore v${VERSION}.zip"
+          zip -r "$ARCHIVE" build
+
+      - name: Publish release
+        uses: softprops/action-gh-release@v2
+        with:
+          tag_name: ${{ steps.version.outputs.tag }}
+          name: JailbreakCore ${{ steps.version.outputs.tag }}
+          body: ${{ steps.notes.outputs.body }}
+          files: |
+            JailbreakCore v${{ steps.version.outputs.version }}.zip
