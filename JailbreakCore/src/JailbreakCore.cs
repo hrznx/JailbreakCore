@@ -398,6 +398,8 @@ public partial class JailbreakCore : BasePlugin
     [EventListener<EventDelegates.OnTick>]
     public void OnTick()
     {
+        Extensions.TickDynamicEffects();
+
         var warden = JBPlayerManagement.GetWarden();
         if (warden == null || !warden.IsValid || !warden.Controller.PawnIsAlive)
         {
