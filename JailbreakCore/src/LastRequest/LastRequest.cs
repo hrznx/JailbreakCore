@@ -47,6 +47,9 @@ public class LastRequest(ISwiftlyCore core)
                 request.IsPrepTimerActive = false;
                 IsPrepTimeActive = false;
 
+                JailbreakCore.Extensions.StopAllPlayerLinkLasers();
+                JailbreakCore.Extensions.StopAllPlayerBeacons();
+
                 PrepTimer?.Cancel();
                 PrepTimer = null;
             }
@@ -54,6 +57,8 @@ public class LastRequest(ISwiftlyCore core)
             {
                 request.IsPrepTimerActive = true;
                 IsPrepTimeActive = true;
+
+                JailbreakCore.Extensions.StartPlayerLinkLaser(prisoner, guardian, durationSeconds: 100);
 
 
                 prisoner.Print(IHud.Html, "last_request_starting_html", null, 5, false, IPrefix.LR, request.Name, prepDelay, guardian.Controller.PlayerName);
