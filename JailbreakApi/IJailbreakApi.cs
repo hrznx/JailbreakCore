@@ -1,3 +1,5 @@
+using System;
+using SwiftlyS2.Shared;
 using SwiftlyS2.Shared.Misc;
 using SwiftlyS2.Shared.Natives;
 using SwiftlyS2.Shared.Players;
@@ -135,6 +137,42 @@ public interface IUtilityService
     /// <param name="key">Key that is localized in JailbreakCore translation folder.</param>
     /// <param name="args">Arguments</param>
     void PrintToCenterAll(string key, params object[] args);
+
+    /// <summary>
+    /// Draws and maintains a laser between two players until stopped.
+    /// </summary>
+    /// <param name="playerA">First endpoint.</param>
+    /// <param name="playerB">Second endpoint.</param>
+    /// <param name="colorOverride">Leave null to auto-pick a default color.</param>
+    /// <param name="width">Laser width.</param>
+    /// <param name="heightOffset">Offset from the player's origin (default eye-level).</param>
+    /// <param name="durationSeconds">Auto-removal after this many seconds; zero/negative keeps it active.</param>
+    Guid DrawLaserBetweenPlayers(IJBPlayer playerA, IJBPlayer playerB, Color? colorOverride = null, float width = 2.0f, float heightOffset = 64.0f, float durationSeconds = 0f);
+
+    /// <summary>
+    /// Removes a previously created link laser.
+    /// </summary>
+    void RemovePlayerLinkLaser(Guid effectId);
+
+    /// <summary>
+    /// Removes every active link laser.
+    /// </summary>
+    void RemoveAllPlayerLinkLasers();
+
+    /// <summary>
+    /// Creates a circular beacon animation that follows the target player.
+    /// </summary>
+    Guid CreatePlayerBeacon(IJBPlayer player, Color? colorOverride = null, int segments = 20, float startRadius = 20.0f, float radiusStep = 10.0f, float durationSeconds = 0.9f, float heightOffset = 5.0f, float stepIntervalSeconds = 0.1f, float width = 2.0f, bool loop = false);
+
+    /// <summary>
+    /// Stops a running beacon animation.
+    /// </summary>
+    void RemovePlayerBeacon(Guid beaconId);
+
+    /// <summary>
+    /// Stops and clears all custom player beacons.
+    /// </summary>
+    void RemoveAllPlayerBeacons();
 }
 
 /// <summary>Context supplied to TakeDamage hook subscribers.</summary>
