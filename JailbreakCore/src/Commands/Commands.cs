@@ -176,11 +176,16 @@ public class Commands(ISwiftlyCore core)
 
         // Save player name BEFORE SetWarden to avoid corrupted Controller
         var playerName = jbPlayer.Controller?.PlayerName ?? "Unknown";
+        Console.WriteLine("[DEBUG] About to call SetWarden(true)...");
 
         jbPlayer.SetWarden(true);
+        Console.WriteLine("[DEBUG] SetWarden(true) completed");
+        
         jbPlayer.Print(IHud.Chat, "warden_take", null, 0, true, IPrefix.JB);
+        Console.WriteLine("[DEBUG] jbPlayer.Print completed");
 
-        JailbreakCore.Extensions.PrintToAlertAll("warden_take_alert", playerName);        if (!string.IsNullOrEmpty(JailbreakCore.Config.Sounds.WardenTake.Path))
+        JailbreakCore.Extensions.PrintToAlertAll("warden_take_alert", playerName);
+        Console.WriteLine("[DEBUG] PrintToAlertAll completed");        if (!string.IsNullOrEmpty(JailbreakCore.Config.Sounds.WardenTake.Path))
         {
             foreach (var otherJbPlayer in JailbreakCore.JBPlayerManagement.GetAllPlayers())
             {

@@ -35,10 +35,10 @@ public class JBPlayer : IDisposable, IJBPlayer
     {
         if (state && !IsWarden)
         {
-            SetRole(IJBRole.Warden);
-            ConfigureWarden();
+          SetRole(IJBRole.Warden);
+          // ConfigureWarden(); // Disabled - causes native crash in RenderModeUpdated()
 
-            if (!Controller.IsHLTV && IsValid)
+          if (!Controller.IsHLTV && IsValid)
             {
                 if (JailbreakCore.Config.Warden.ShowMenuOnSet)
                     JailbreakCore.WardenMenu.Display(this);
