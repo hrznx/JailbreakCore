@@ -307,23 +307,27 @@ public class JBPlayer : IDisposable, IJBPlayer
             if (!IsValid || !PlayerPawn.IsValid)
                 return;
 
-            // Color rendering causes crash - disabled for now
-            //try
-            //{
-            //    var color = new Color(
-            //    JailbreakCore.Config.Colors.WardenColor[0],
-            //    JailbreakCore.Config.Colors.WardenColor[1],
-            //    JailbreakCore.Config.Colors.WardenColor[2]);
-            //
-            //    SetColor(color);
-            //}
-            //catch
-            //{
-            //    // Ignore color setting errors
-            //}
+            // The new update should fix the crash.
+            try
+            {
+                var color = new Color(
+                JailbreakCore.Config.Colors.WardenColor[0],
+                JailbreakCore.Config.Colors.WardenColor[1],
+                JailbreakCore.Config.Colors.WardenColor[2]);
 
-            //if (!string.IsNullOrEmpty(WardenModel))
-            //    PlayerPawn.SetModel(WardenModel);
+                SetColor(color);
+            }
+            catch
+            {
+                // Ignore color setting errors
+            }
+
+
+            _Core.Scheduler.NextTick(() =>
+            {
+                if (!string.IsNullOrEmpty(WardenModel))
+                    PlayerPawn.SetModel(WardenModel);
+            });
         });
     }
     private void ClearWaden()
