@@ -302,31 +302,44 @@ public class JBPlayer : IDisposable, IJBPlayer
     }
     private void ConfigureWarden()
     {
-        _Core.Scheduler.NextTick(() =>
+        _Core.Scheduler.NextWorldUpdate(() =>
         {
-            if (!IsValid || !PlayerPawn.IsValid)
-                return;
-
-            // The new update should fix the crash.
             try
             {
+                if (!IsValid || !PlayerPawn.IsValid)
+                    return;
+
                 var color = new Color(
                 JailbreakCore.Config.Colors.WardenColor[0],
                 JailbreakCore.Config.Colors.WardenColor[1],
                 JailbreakCore.Config.Colors.WardenColor[2]);
 
-                SetColor(color);
+                // Set color directly without nested NextTick to avoid entity corruption
+                PlayerPawn.RenderMode = RenderMode_t.kRenderTransColor;
+                PlayerPawn.RenderModeUpdated();
+                PlayerPawn.Render = color;
+                PlayerPawn.RenderUpdated();
             }
             catch
             {
-                // Ignore color setting errors
+                // Ignore color setting errors from entity corruption
             }
 
 
-            _Core.Scheduler.NextTick(() =>
+            _Core.Scheduler.NextWorldUpdate(() =>
             {
-                if (!string.IsNullOrEmpty(WardenModel))
-                    PlayerPawn.SetModel(WardenModel);
+                try
+                {
+                    if (!IsValid || !PlayerPawn.IsValid)
+                        return;
+
+                    if (!string.IsNullOrEmpty(WardenModel))
+                        PlayerPawn.SetModel(WardenModel);
+                }
+                catch
+                {
+                    // Ignore model setting errors from entity corruption
+                }
             });
         });
     }

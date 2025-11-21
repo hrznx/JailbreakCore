@@ -246,18 +246,31 @@ public partial class JailbreakCore : BasePlugin
         {
             Core.Scheduler.DelayBySeconds(5.0f, () =>
             {
-                if (JBPlayerManagement.GetWarden() == null)
+                try
                 {
-                    Extensions.AssignRandomWarden();
-                    Extensions.PrintToCenterAll("warden_take_alert", JBPlayerManagement.GetWarden()?.Controller.PlayerName ?? "");
-
-                    if (!string.IsNullOrEmpty(Config.Sounds.WardenTake.Path))
+                    if (JBPlayerManagement.GetWarden() == null)
                     {
-                        foreach (var otherJbPlayer in JBPlayerManagement.GetAllPlayers())
+                        // Get the player and name BEFORE SetWarden to avoid corrupted Controller
+                        var guardians = JBPlayerManagement.GetAllGuardians();
+                        if (guardians.Count > 0)
                         {
-                            //otherJbPlayer.PlaySound(Config.Sounds.WardenTake.Path, Config.Sounds.WardenTake.Volume);
+                            var randomGuardian = guardians[new Random().Next(guardians.Count)];
+                            var playerName = randomGuardian.Controller?.PlayerName ?? "Unknown";
+
+                            randomGuardian.SetWarden(true);
+                            Extensions.PrintToCenterAll("warden_take_alert", playerName);
+                        }                        if (!string.IsNullOrEmpty(Config.Sounds.WardenTake.Path))
+                        {
+                            foreach (var otherJbPlayer in JBPlayerManagement.GetAllPlayers())
+                            {
+                                //otherJbPlayer.PlaySound(Config.Sounds.WardenTake.Path, Config.Sounds.WardenTake.Volume);
+                            }
                         }
                     }
+                }
+                catch
+                {
+                    // Ignore errors in warden assignment
                 }
             });
 

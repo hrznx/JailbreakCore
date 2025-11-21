@@ -174,12 +174,13 @@ public class Commands(ISwiftlyCore core)
             return;
         }
 
+        // Save player name BEFORE SetWarden to avoid corrupted Controller
+        var playerName = jbPlayer.Controller?.PlayerName ?? "Unknown";
+
         jbPlayer.SetWarden(true);
         jbPlayer.Print(IHud.Chat, "warden_take", null, 0, true, IPrefix.JB);
 
-        JailbreakCore.Extensions.PrintToAlertAll("warden_take_alert", jbPlayer.Controller.PlayerName);
-
-        if (!string.IsNullOrEmpty(JailbreakCore.Config.Sounds.WardenTake.Path))
+        JailbreakCore.Extensions.PrintToAlertAll("warden_take_alert", playerName);        if (!string.IsNullOrEmpty(JailbreakCore.Config.Sounds.WardenTake.Path))
         {
             foreach (var otherJbPlayer in JailbreakCore.JBPlayerManagement.GetAllPlayers())
             {
@@ -297,3 +298,4 @@ public class Commands(ISwiftlyCore core)
         JailbreakCore.SDMenu.Display(jbPlayer);
     }
 }
+
