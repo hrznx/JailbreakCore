@@ -321,12 +321,12 @@ public class JBPlayer : IDisposable, IJBPlayer
         {
             SetColor(DefaultColor);
 
-            if (Controller.TeamNum == (int)Team.CT)
+            if (Controller.Team == Team.CT)
             {
                 if (!string.IsNullOrEmpty(GuardianModel))
                     PlayerPawn.SetModel(GuardianModel);
             }
-            else if (Controller.TeamNum == (int)Team.T)
+            else if (Controller.Team == Team.T)
             {
                 if (!string.IsNullOrEmpty(PrisonerModel))
                     PlayerPawn.SetModel(PrisonerModel);

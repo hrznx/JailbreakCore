@@ -1,24 +1,4 @@
 {
-  "prefix": "[gold][[yellow]SD[gold]][default] ",
-  "ffa_day<name>": "Free For All",
-  "ffa_day<description>": "[yellow]Free For All[default]. Everybody are enemies!",
-  "teleport_day<name>": "Teleport",
-  "teleport_day<description>": "[yellow]Teleport[default]. You switch places with the one you shoot!",
-  "noscope_day<name>": "No Scope",
-  "noscope_day<description>": "[yellow]No Scope[default]. You can't use scope!",
-  "one_in_the_chamber_day<name>": "One In The Chamber",
-  "one_in_the_chamber_day<description>": "[yellow]OITC[default]. Each kill gives u a bullet!",
-  "headshot_only_day<name>": "Headshot Only",
-  "headshot_only_day<description>": "[yellow]Headshot Only[default]. You can only kill with headshot!",
-  "hide_and_seek_day<name>": "Hide And Seek",
-  "hide_and_seek_day<description>": "[yellow]Hide And Seek[default]. Prisoners have 60 seconds to hide!",
-  "knife_fight_day<name>": "Knife Fight",
-  "knife_fight_day<description>": "Everybody uses their knife!",
-  "knife_fight_gravity_day<name>": "Knife Fight (Low Gravity)",
-  "knife_fight_gravity_day<description>": "Everybody uses their knife! Low gravity enabled!",
-  "knife_fight_speed_day<name>": "Knife Fight (High Speed)",
-  "knife_fight_speed_day<description>": "Everybody uses their knife! High speed enabled!",
-  "guns_menu<title>": "Select Rifle",
-  "pistol_menu<title>": "Select Pistol",
-  "day_starting": "[yellow]{0}[default] day starts in [red]{1}[default] seconds"
+  "prefix": "[gold][[red]LR[gold]][default] ",
+  "knife_fight_lr<name>": "Knife Fight"
 }

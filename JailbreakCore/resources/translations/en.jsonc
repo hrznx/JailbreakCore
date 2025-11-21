@@ -28,6 +28,8 @@
   "last_request_weapons_menu<title>": "Select Weapon",
   "surrender_menu<title>": "{0} Wants To Surrender",
   "heal_request_menu<title>": "{0} Wants To Heal",
+  "select_color<title>": "Write A Color",
+  "set_color<option>": "Set Color",
   "accept<option>": "Accept",
   "refuse<option>": "Refuse",
   "last_request_no_guardian<option>": "<font color='red'>No Avaliable Guardians!</font>",
