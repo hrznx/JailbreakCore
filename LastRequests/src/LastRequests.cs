@@ -4,6 +4,7 @@ using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Logging;
 using Microsoft.Extensions.Options;
 using SwiftlyS2.Shared;
+using SwiftlyS2.Shared.Events;
 using SwiftlyS2.Shared.Misc;
 using SwiftlyS2.Shared.Natives;
 using SwiftlyS2.Shared.Players;
@@ -167,6 +168,7 @@ public class KnifeFight(ISwiftlyCore _core, IJailbreakApi _api, Library _library
     public bool IsPrepTimerActive { get; set; }
     public bool IsOneShotEnable = false;
     private IDisposable? _damageHook = null;
+    private HashSet<ushort> AllowedWeaponsDefIndex { get; } = new(GetAllowedWeapons());
     private static IEnumerable<ushort> GetAllowedWeapons()
     {
         var knifes = new[]
@@ -205,7 +207,7 @@ public class KnifeFight(ISwiftlyCore _core, IJailbreakApi _api, Library _library
         Prisoner = prisoner;
 
         _damageHook = Api.Hooks.HookTakeDamage(OnTakeDamage);
-
+        Core.Event.OnItemServicesCanAcquireHook += OnCanAcquire;
         Guardian.Pawn.ItemServices?.RemoveItems();
         Prisoner.Pawn.ItemServices?.RemoveItems();
 
@@ -260,6 +262,15 @@ public class KnifeFight(ISwiftlyCore _core, IJailbreakApi _api, Library _library
         return HookResult.Continue;
 
 
+    }
+    public void OnCanAcquire(IOnItemServicesCanAcquireHookEvent @event)
+    {
+        var econItem = @event.EconItemView;
+        if (!AllowedWeaponsDefIndex.Contains(econItem.ItemDefinitionIndex))
+        {
+            @event.SetAcquireResult(AcquireResult.NotAllowedByProhibition);
+            return;
+        }
     }
     public void End(IJBPlayer? winner, IJBPlayer? loser)
     {
