@@ -9,6 +9,7 @@ public class JailbreakConfig
     public ModelsConfig Models { get; set; } = new();
     public SpecialDayConfig SpecialDay { get; set; } = new();
     public Bunnyhoop_Config Bunnyhoop { get; set; } = new();
+    public LastRequestConfig LastRequest { get; set; } = new();
 }
 public class WardenConfig
 {
@@ -94,4 +95,11 @@ public class Bunnyhoop_Config
     public int RoundStartCooldown { get; set; } = 30;
     public bool EnableOnLastRequest { get; set; } = true;
     public bool EnableOnSpecialDay { get; set; } = true;
+}
+public class LastRequestConfig
+{
+    public int PrepCountdownSeconds { get; set; } = 5;
+    public bool ShowHtmlCountdown { get; set; } = true;
+    public bool EnableLinkLaser { get; set; } = true;
+    public bool EnablePlayerBeacons { get; set; } = true;
 }

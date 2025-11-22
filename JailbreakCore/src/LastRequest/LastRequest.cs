@@ -1,4 +1,6 @@
+using System;
 using Jailbreak.Shared;
+using Microsoft.Extensions.Logging;
 using SwiftlyS2.Shared;
 using SwiftlyS2.Shared.Misc;
 using SwiftlyS2.Shared.Natives;
@@ -11,6 +13,9 @@ public class LastRequest(ISwiftlyCore core)
     private readonly List<ILastRequest> Requests = new();
     private ILastRequest? ActiveRequest;
     private CancellationTokenSource? PrepTimer;
+    private Guid? ActiveLinkLaserId;
+    private Guid? GuardianBeaconId;
+    private Guid? PrisonerBeaconId;
 
     public IReadOnlyList<ILastRequest> GetRequests() => Requests;
     public ILastRequest? GetActiveRequest() => ActiveRequest;
@@ -35,35 +40,47 @@ public class LastRequest(ISwiftlyCore core)
         ActiveRequest.SelectedWeaponName = weaponName;
         ActiveRequest.SelectedWeaponID = weaponId;
 
-        int prepDelay = 0;
+        int prepDelay = Math.Max(0, JailbreakCore.Config.LastRequest.PrepCountdownSeconds);
+
+        if (prepDelay <= 0)
+        {
+            request.IsPrepTimerActive = false;
+            IsPrepTimeActive = false;
+            StartRequest(guardian, prisoner);
+            return;
+        }
+
+        request.IsPrepTimerActive = true;
+        IsPrepTimeActive = true;
+
+        BeginPrepVisuals(prisoner, guardian);
+        SendPrepHtmlCountdown(request, guardian, prisoner, prepDelay);
 
         PrepTimer = _Core.Scheduler.RepeatBySeconds(1, () =>
         {
+            if (ActiveRequest == null)
+            {
+                StopPrepVisuals();
+                PrepTimer?.Cancel();
+                PrepTimer = null;
+                IsPrepTimeActive = false;
+                return;
+            }
+
             prepDelay--;
 
             if (prepDelay <= 0)
             {
-                StartRequest(guardian, prisoner);
                 request.IsPrepTimerActive = false;
                 IsPrepTimeActive = false;
-
-                JailbreakCore.Extensions.StopAllPlayerLinkLasers();
-                JailbreakCore.Extensions.StopAllPlayerBeacons();
-
+                StopPrepVisuals();
+                StartRequest(guardian, prisoner);
                 PrepTimer?.Cancel();
                 PrepTimer = null;
             }
             else
             {
-                request.IsPrepTimerActive = true;
-                IsPrepTimeActive = true;
-
-                JailbreakCore.Extensions.StartPlayerLinkLaser(prisoner, guardian, durationSeconds: 100);
-
-
-                prisoner.Print(IHud.Html, "last_request_starting_html", null, 5, false, IPrefix.LR, request.Name, prepDelay, guardian.Controller.PlayerName);
-
-                guardian.Print(IHud.Html, "last_request_starting_html", null, 5, false, IPrefix.LR, request.Name, prepDelay, prisoner.Controller.PlayerName);
+                SendPrepHtmlCountdown(request, guardian, prisoner, prepDelay);
             }
         });
     }
@@ -89,8 +106,10 @@ public class LastRequest(ISwiftlyCore core)
             ActiveRequest = null;
         }
 
+        StopPrepVisuals();
         PrepTimer?.Cancel();
         PrepTimer = null;
+        IsPrepTimeActive = false;
     }
     public void OnPlayerDeath(IJBPlayer player)
     {
@@ -125,5 +144,72 @@ public class LastRequest(ISwiftlyCore core)
         }
 
         return HookResult.Continue;
+    }
+
+    private void BeginPrepVisuals(JBPlayer prisoner, JBPlayer guardian)
+    {
+        var config = JailbreakCore.Config.LastRequest;
+
+        if (config.EnableLinkLaser && !ActiveLinkLaserId.HasValue)
+        {
+            try
+            {
+                ActiveLinkLaserId = JailbreakCore.Extensions.StartPlayerLinkLaser(prisoner, guardian);
+            }
+            catch (Exception ex)
+            {
+                _Core.Logger.LogWarning(ex, "Failed to start Last Request link laser between {Prisoner} and {Guardian}", prisoner.Controller.PlayerName, guardian.Controller.PlayerName);
+            }
+        }
+
+        if (config.EnablePlayerBeacons)
+        {
+            if (!PrisonerBeaconId.HasValue)
+            {
+                PrisonerBeaconId = JailbreakCore.Extensions.CreateBeaconAnimationOnPlayer(prisoner, loop: true);
+            }
+
+            if (!GuardianBeaconId.HasValue)
+            {
+                GuardianBeaconId = JailbreakCore.Extensions.CreateBeaconAnimationOnPlayer(guardian, loop: true);
+            }
+        }
+    }
+
+    private void StopPrepVisuals()
+    {
+        if (ActiveLinkLaserId.HasValue)
+        {
+            JailbreakCore.Extensions.StopPlayerLinkLaser(ActiveLinkLaserId.Value);
+            ActiveLinkLaserId = null;
+        }
+
+        if (PrisonerBeaconId.HasValue)
+        {
+            JailbreakCore.Extensions.StopPlayerBeacon(PrisonerBeaconId.Value);
+            PrisonerBeaconId = null;
+        }
+
+        if (GuardianBeaconId.HasValue)
+        {
+            JailbreakCore.Extensions.StopPlayerBeacon(GuardianBeaconId.Value);
+            GuardianBeaconId = null;
+        }
+    }
+
+    private void SendPrepHtmlCountdown(ILastRequest request, JBPlayer guardian, JBPlayer prisoner, int secondsRemaining)
+    {
+        if (!JailbreakCore.Config.LastRequest.ShowHtmlCountdown)
+            return;
+
+        if (prisoner.IsValid)
+        {
+            prisoner.Print(IHud.Html, "last_request_starting_html", null, 5, false, IPrefix.LR, request.Name, secondsRemaining, guardian.Controller.PlayerName);
+        }
+
+        if (guardian.IsValid)
+        {
+            guardian.Print(IHud.Html, "last_request_starting_html", null, 5, false, IPrefix.LR, request.Name, secondsRemaining, prisoner.Controller.PlayerName);
+        }
     }
 }
