@@ -444,11 +444,11 @@ public partial class JailbreakCore : BasePlugin
         if ((warden.Player.PressedButtons & GameButtonFlags.E) != 0)
         {
             // Get warden's eye position and forward vector
-            var absOrigin = warden.PlayerPawn.AbsOrigin;
-            if (!absOrigin.HasValue)
+            var eyePos = warden.PlayerPawn.EyePosition;
+            if (eyePos == null)
                 return;
 
-            var eyePos = new Vector(absOrigin.Value.X, absOrigin.Value.Y, absOrigin.Value.Z + 64); // Add eye height
+            var eyePosValue = eyePos.Value;
 
             var eyeAngles = warden.PlayerPawn.EyeAngles;
 
@@ -464,13 +464,13 @@ public partial class JailbreakCore : BasePlugin
             // Calculate end position (4096 units ahead in view direction)
             float distance = 4096.0f;
             var endPos = new Vector(
-                eyePos.X + distance * cosPitch * cosYaw,
-                eyePos.Y + distance * cosPitch * sinYaw,
-                eyePos.Z - distance * sinPitch
+                eyePosValue.X + distance * cosPitch * cosYaw,
+                eyePosValue.Y + distance * cosPitch * sinYaw,
+                eyePosValue.Z - distance * sinPitch
             );
 
             // Create or update the laser
-            Extensions.UpdateWardenLaser(warden, eyePos, endPos);
+            Extensions.UpdateWardenLaser(warden, eyePosValue, endPos);
         }
         else
         {
