@@ -1,4 +1,5 @@
 //using AudioApi;
+using AudioApi;
 using Jailbreak.Shared;
 using SwiftlyS2.Shared;
 using SwiftlyS2.Shared.Natives;
@@ -379,7 +380,7 @@ public class JBPlayer : IDisposable, IJBPlayer
         });
         */
     }
-    /*public void PlaySound(string mp3path, float volume)
+    public void PlaySound(string mp3path, float volume)
     {
         IAudioChannelController controller = JailbreakCore.Audio.UseChannel("jailbreak_core");
         IAudioSource source = JailbreakCore.Audio.DecodeFromFile(Path.Combine(_Core.PluginDataDirectory, mp3path));
@@ -388,7 +389,6 @@ public class JBPlayer : IDisposable, IJBPlayer
         controller.SetVolume(Player.PlayerID, volume);
         controller.Play(Player.PlayerID);
     }
-    */
     public void Dispose()
     {
         SetRole(IJBRole.None);

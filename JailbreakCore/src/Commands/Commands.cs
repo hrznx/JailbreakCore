@@ -185,7 +185,7 @@ public class Commands(ISwiftlyCore core)
         {
             foreach (var otherJbPlayer in JailbreakCore.JBPlayerManagement.GetAllPlayers())
             {
-                //otherJbPlayer.PlaySound(JailbreakCore.Config.Sounds.WardenTake.Path, JailbreakCore.Config.Sounds.WardenTake.Volume);
+                otherJbPlayer.PlaySound(JailbreakCore.Config.Sounds.WardenTake.Path, JailbreakCore.Config.Sounds.WardenTake.Volume);
             }
         }
     }
@@ -224,7 +224,7 @@ public class Commands(ISwiftlyCore core)
         {
             foreach (var otherJbPlayer in JailbreakCore.JBPlayerManagement.GetAllPlayers())
             {
-                //otherJbPlayer.PlaySound(JailbreakCore.Config.Sounds.WardenRemoved.Path, JailbreakCore.Config.Sounds.WardenRemoved.Volume);
+                otherJbPlayer.PlaySound(JailbreakCore.Config.Sounds.WardenRemoved.Path, JailbreakCore.Config.Sounds.WardenRemoved.Volume);
             }
         }
 
@@ -237,7 +237,7 @@ public class Commands(ISwiftlyCore core)
                 {
                     foreach (var otherJbPlayer in JailbreakCore.JBPlayerManagement.GetAllPlayers())
                     {
-                        //otherJbPlayer.PlaySound(JailbreakCore.Config.Sounds.WardenTake.Path, JailbreakCore.Config.Sounds.WardenTake.Volume);
+                        otherJbPlayer.PlaySound(JailbreakCore.Config.Sounds.WardenTake.Path, JailbreakCore.Config.Sounds.WardenTake.Volume);
                     }
                 }
                 JailbreakCore.Extensions.PrintToCenterAll("warden_take_alert", JailbreakCore.JBPlayerManagement.GetWarden()?.Controller.PlayerName ?? "");
