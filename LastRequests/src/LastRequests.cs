@@ -1,5 +1,6 @@
 using System;
 using Jailbreak.Shared;
+using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Logging;
 using Microsoft.Extensions.Options;
@@ -33,10 +34,10 @@ public partial class LastRequests : BasePlugin
     public override void Load(bool hotReload)
     {
         Core.Configuration
-            .InitializeTomlWithModel<LRConfig>("config.toml", "LastRequests")
+            .InitializeJsonWithModel<LRConfig>("config.json", "LastRequests")
             .Configure(builder =>
             {
-                builder.AddTomlFile("config.toml", false, true);
+                builder.AddJsonFile("config.json", false, true);
             });
 
         ServiceCollection services = new();

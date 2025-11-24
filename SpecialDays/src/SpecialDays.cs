@@ -1,4 +1,5 @@
 using Jailbreak.Shared;
+using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Options;
 using SwiftlyS2.Shared;
@@ -34,10 +35,10 @@ public partial class SpecialDays : BasePlugin
     public override void Load(bool hotReload)
     {
         Core.Configuration
-            .InitializeTomlWithModel<DaysConfig>("config.toml", "SpecialDays")
+            .InitializeJsonWithModel<DaysConfig>("config.json", "SpecialDays")
             .Configure(builder =>
             {
-                builder.AddTomlFile("config.toml", false, true);
+                builder.AddJsonFile("config.json", false, true);
             });
 
         ServiceCollection services = new();
