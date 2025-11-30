@@ -11,7 +11,6 @@ using SwiftlyS2.Shared.Misc;
 using SwiftlyS2.Shared.Natives;
 using SwiftlyS2.Shared.Players;
 using SwiftlyS2.Shared.Plugins;
-using Tomlyn.Extensions.Configuration;
 
 namespace JailbreakCore;
 
